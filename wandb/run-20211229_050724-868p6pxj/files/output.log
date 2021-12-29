@@ -1,0 +1,38 @@
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+d: 0.2020; g: 6.8897; r1: 0.0002; path: 0.2789; mean path: 0.0645; augment: 0.0001:   0% 25/800000 [01:04<573:17:59,  2.58s/it]
+Traceback (most recent call last):
+  File "train.py", line 559, in <module>
+    train(args, loader, generator, discriminator, g_optim, d_optim, g_ema, device)
+  File "train.py", line 198, in train
+    ada_aug_p = ada_augment.tune(real_pred)
+  File "/usr/local/lib/python3.7/dist-packages/torch/autograd/grad_mode.py", line 26, in decorate_context
+    return func(*args, **kwargs)
+  File "/content/drive/My Drive/Colab Notebooks/stylegan2-pytorch/non_leaking.py", line 26, in tune
+    (torch.sign(real_pred).sum().item(), real_pred.shape[0]),
+KeyboardInterrupt

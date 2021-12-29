@@ -19,7 +19,7 @@ except ImportError:
     wandb = None
 
 
-from dataset import MultiResolutionDataset
+from dataset import MultiResolutionDataset, WSICoordDataset
 from distributed import (
     get_rank,
     synchronize,
@@ -308,13 +308,13 @@ def train(args, loader, generator, discriminator, g_optim, d_optim, g_ema, devic
                     sample, _ = g_ema([sample_z])
                     utils.save_image(
                         sample,
-                        f"sample/{str(i).zfill(6)}.png",
+                        os.path.join(args.out_dir, f"sample/{str(i).zfill(6)}.png"),
                         nrow=int(args.n_sample ** 0.5),
                         normalize=True,
                         range=(-1, 1),
                     )
 
-            if i % 10000 == 0:
+            if i % 3000 == 0:
                 torch.save(
                     {
                         "g": g_module.state_dict(),
@@ -325,7 +325,7 @@ def train(args, loader, generator, discriminator, g_optim, d_optim, g_ema, devic
                         "args": args,
                         "ada_aug_p": ada_aug_p,
                     },
-                    f"checkpoint/{str(i).zfill(6)}.pt",
+                    os.path.join(args.out_dir, f"checkpoint/{str(i).zfill(6)}.pt"),
                 )
 
 
@@ -334,7 +334,14 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description="StyleGAN2 trainer")
 
-    parser.add_argument("path", type=str, help="path to the lmdb dataset")
+    # parser.add_argument("path", type=str, help="path to the lmdb dataset")
+    parser.add_argument("--log_name", type=str, default = 'test-project', help="wandb log project name [default 'test-project']")
+    parser.add_argument("--out_dir", type=str, default = '.', help="Result directory [default './']")
+    parser.add_argument("--wsi_dir", type=str, help="WSI directory")
+    parser.add_argument("--coord_dir", type=str, help="Coord h5 file directory")
+    parser.add_argument("--wsi_exten", type=str, default='.tif', help="WSI extension [default '.tif']")
+    parser.add_argument("--max_coord_per_wsi", type=float, default='inf', help="Maximum number of coordinates to sample from WSI [default inf]")
+    parser.add_argument("--max_size", type=int, default=None, help="Maximum number of images to train with [default inf]")
     parser.add_argument('--arch', type=str, default='stylegan2', help='model architectures (stylegan2 | swagan)')
     parser.add_argument(
         "--iter", type=int, default=800000, help="total training iterations"
@@ -349,7 +356,7 @@ if __name__ == "__main__":
         help="number of the samples generated during training",
     )
     parser.add_argument(
-        "--size", type=int, default=256, help="image sizes for the model"
+        "--size", type=int, default=256, help="image sizes/resolution for the model"
     )
     parser.add_argument(
         "--r1", type=float, default=10, help="weight of the r1 regularization"
@@ -429,6 +436,18 @@ if __name__ == "__main__":
     )
 
     args = parser.parse_args()
+    
+    
+    if not os.path.exists(os.path.join(args.out_dir,'sample')):
+        os.makedirs(os.path.join(args.out_dir,'sample'))
+    else:
+        print(os.path.join(args.out_dir,'sample'), 'exists! Skipping...')
+    
+    if not os.path.exists(os.path.join(args.out_dir,'checkpoint')):
+        os.makedirs(os.path.join(args.out_dir,'checkpoint'))
+    else:
+        print(os.path.join(args.out_dir,'checkpoint'), 'exists! Skipping...')
+    
 
     n_gpu = int(os.environ["WORLD_SIZE"]) if "WORLD_SIZE" in os.environ else 1
     args.distributed = n_gpu > 1
@@ -517,15 +536,24 @@ if __name__ == "__main__":
         ]
     )
 
-    dataset = MultiResolutionDataset(args.path, transform, args.size)
+    # dataset = MultiResolutionDataset(args.path, transform, args.size)
+    dataset = WSICoordDataset(wsi_dir=args.wsi_dir, coord_dir=args.coord_dir, wsi_exten=args.wsi_exten, 
+                        max_coord_per_wsi=args.max_coord_per_wsi, resolution=args.size, 
+                        # use_labels=False,
+                        max_size=args.max_size, xflip=False, transform = transform)
     loader = data.DataLoader(
         dataset,
         batch_size=args.batch,
         sampler=data_sampler(dataset, shuffle=True, distributed=args.distributed),
         drop_last=True,
+        pin_memory=True, 
+        num_workers=2, 
     )
 
     if get_rank() == 0 and wandb is not None and args.wandb:
-        wandb.init(project="stylegan 2")
+        if args.ckpt is not None:
+            wandb.init(project=args.log_name, entity="crobbins327", resume=True)
+        else:
+            wandb.init(project=args.log_name, entity="crobbins327")
 
     train(args, loader, generator, discriminator, g_optim, d_optim, g_ema, device)

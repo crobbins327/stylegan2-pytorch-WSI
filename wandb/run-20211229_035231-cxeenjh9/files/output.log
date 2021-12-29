@@ -1,0 +1,129 @@
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+d: 0.0278; g: 8.2140; r1: 0.0010; path: 0.0133; mean path: 0.1061; augment: 0.0012:   0% 100/800000 [03:55<522:51:04,  2.35s/it]
+Traceback (most recent call last):
+  File "train.py", line 559, in <module>
+    train(args, loader, generator, discriminator, g_optim, d_optim, g_ema, device)
+  File "train.py", line 308, in train
+    sample, _ = g_ema([sample_z])
+  File "/usr/local/lib/python3.7/dist-packages/torch/nn/modules/module.py", line 727, in _call_impl
+    result = self.forward(*input, **kwargs)
+  File "/content/drive/My Drive/Colab Notebooks/stylegan2-pytorch/model.py", line 558, in forward
+    out = conv1(out, latent[:, i], noise=noise1)
+  File "/usr/local/lib/python3.7/dist-packages/torch/nn/modules/module.py", line 727, in _call_impl
+    result = self.forward(*input, **kwargs)
+  File "/content/drive/My Drive/Colab Notebooks/stylegan2-pytorch/model.py", line 361, in forward
+    out = self.conv(input, style)
+  File "/usr/local/lib/python3.7/dist-packages/torch/nn/modules/module.py", line 727, in _call_impl
+    result = self.forward(*input, **kwargs)
+  File "/content/drive/My Drive/Colab Notebooks/stylegan2-pytorch/model.py", line 282, in forward
+    out = self.blur(out)
+  File "/usr/local/lib/python3.7/dist-packages/torch/nn/modules/module.py", line 727, in _call_impl
+    result = self.forward(*input, **kwargs)
+  File "/content/drive/My Drive/Colab Notebooks/stylegan2-pytorch/model.py", line 89, in forward
+    out = upfirdn2d(input, self.kernel, pad=self.pad)
+  File "/content/drive/My Drive/Colab Notebooks/stylegan2-pytorch/op/upfirdn2d.py", line 163, in upfirdn2d
+    out = UpFirDn2d.apply(input, kernel, up, down, pad)
+  File "/content/drive/My Drive/Colab Notebooks/stylegan2-pytorch/op/upfirdn2d.py", line 120, in forward
+    input, kernel, up_x, up_y, down_x, down_y, pad_x0, pad_x1, pad_y0, pad_y1
+RuntimeError: CUDA out of memory. Tried to allocate 4.00 GiB (GPU 0; 15.90 GiB total capacity; 7.38 GiB already allocated; 1.46 GiB free; 13.61 GiB reserved in total by PyTorch)

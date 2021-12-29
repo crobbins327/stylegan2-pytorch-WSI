@@ -1,0 +1,20 @@
+
+  0% 0/800000 [00:03<?, ?it/s]
+Traceback (most recent call last):
+  File "train.py", line 559, in <module>
+    train(args, loader, generator, discriminator, g_optim, d_optim, g_ema, device)
+  File "train.py", line 186, in train
+    real_pred = discriminator(real_img_aug)
+  File "/usr/local/lib/python3.7/dist-packages/torch/nn/modules/module.py", line 727, in _call_impl
+    result = self.forward(*input, **kwargs)
+  File "/content/drive/MyDrive/Colab Notebooks/stylegan2-pytorch/model.py", line 680, in forward
+    out = self.convs(input)
+  File "/usr/local/lib/python3.7/dist-packages/torch/nn/modules/module.py", line 727, in _call_impl
+    result = self.forward(*input, **kwargs)
+  File "/usr/local/lib/python3.7/dist-packages/torch/nn/modules/container.py", line 117, in forward
+    input = module(input)
+  File "/usr/local/lib/python3.7/dist-packages/torch/nn/modules/module.py", line 727, in _call_impl
+    result = self.forward(*input, **kwargs)
+  File "/content/drive/MyDrive/Colab Notebooks/stylegan2-pytorch/model.py", line 634, in forward
+    out = (out + skip) / math.sqrt(2)
+RuntimeError: CUDA out of memory. Tried to allocate 512.00 MiB (GPU 0; 15.90 GiB total capacity; 14.18 GiB already allocated; 439.75 MiB free; 14.66 GiB reserved in total by PyTorch)
