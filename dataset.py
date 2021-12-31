@@ -13,6 +13,7 @@ import dnnlib
 import openslide
 import h5py
 import random
+import pandas
 
 class MultiResolutionDataset(Dataset):
     def __init__(self, path, transform, resolution=256):
