@@ -13,7 +13,7 @@ import dnnlib
 import openslide
 import h5py
 import random
-import pandas
+import pandas as pd
 
 class MultiResolutionDataset(Dataset):
     def __init__(self, path, transform, resolution=256):
@@ -270,7 +270,7 @@ class WSICoordDataset(Dataset):
             #    print('{} for {}'.format(seg_level, wsi_name))
         else:
             seg_level = 0
-        img = np.array(wsi.read_region(coord, seg_level, (self.patch_size, self.patch_size)).convert('RGB'))
+        img = wsi.read_region(coord, seg_level, (self.patch_size, self.patch_size)).convert('RGB')
         # img = img.transpose(2, 0, 1) # HWC => CHW
         # img = np.moveaxis(img, 2, 0) # HWC => CHW
         return img

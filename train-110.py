@@ -549,7 +549,8 @@ if __name__ == "__main__":
         sampler=data_sampler(dataset, shuffle=True, distributed=args.distributed),
         drop_last=True,
         pin_memory=True, 
-        num_workers=4, 
+        num_workers=12,
+        prefetch_factor=4, 
     )
 
     if get_rank() == 0 and wandb is not None and args.wandb:
