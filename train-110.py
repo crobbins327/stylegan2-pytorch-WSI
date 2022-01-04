@@ -343,6 +343,7 @@ if __name__ == "__main__":
     parser.add_argument("--process_list", type=str, default=None, help="WSI process list and seg levels [default None]")
     parser.add_argument("--wsi_exten", type=str, default='.tif', help="WSI extension [default '.tif']")
     parser.add_argument("--max_coord_per_wsi", type=float, default='inf', help="Maximum number of coordinates to sample from WSI [default inf]")
+    parser.add_argument("--rescale_mpp", type=float, default=None, help='Rescale WSIs to microns per pixel (MPP)')
     parser.add_argument("--max_size", type=int, default=None, help="Maximum number of images to train with [default inf]")
     parser.add_argument('--arch', type=str, default='stylegan2', help='model architectures (stylegan2 | swagan)')
     parser.add_argument(
@@ -539,8 +540,17 @@ if __name__ == "__main__":
     )
 
     # dataset = MultiResolutionDataset(args.path, transform, args.size)
+    if args.rescale_mpp is not None:
+        assert isinstance(args.rescale_mpp, float)
+        rescale_bool = True
+        desired_mpp = float(args.rescale_mpp)
+    else:
+        rescale_bool = False
+        desired_mpp = None
     dataset = WSICoordDataset(wsi_dir=args.wsi_dir, coord_dir=args.coord_dir, process_list=args.process_list,
-                        wsi_exten=args.wsi_exten, max_coord_per_wsi=args.max_coord_per_wsi, resolution=args.size, desc=args.log_name, 
+                        wsi_exten=args.wsi_exten, max_coord_per_wsi=args.max_coord_per_wsi, resolution=args.size, 
+                        rescale_mpp = rescale_bool, desired_mpp = desired_mpp,
+                        desc=args.log_name, 
                         # use_labels=False,
                         max_size=args.max_size, xflip=False, transform = transform)
     loader = data.DataLoader(
